@@ -6,8 +6,6 @@ const TOTAL = 150;
 const PER_PRESTIGE = 30;
 const COLORS = ["#06b6d4","#22c55e","#c026d3","#f43f5e","#fbbf24"];
 
-// O Banco de Questões foi adaptado com o material (Nível 101 ao 113)
-// As alternativas ('o') foram escritas para terem o MESMO TAMANHO!
 const bank = [
  {n: 101, title:"HTML: Pattern", learn:"Patterns (padrões) ajudam a construir interfaces de forma robusta e previsível, mantendo a semântica em dia.", metaphor:"Pense num molde de gesso para as paredes: o formato sempre sai padronizado e perfeito.", img: "https://placehold.co/600x300/c026d3/white?text=HTML+Pattern", q:"Qual a vantagem principal de utilizar Patterns no seu código?", o:["Garante uma interface previsível e robusta.","Remove a necessidade de aplicar os estilos.","Aumenta muito o tempo para o carregamento.","Deixa o código sem semântica e inacessível."], a:0, tip:"Patterns servem justamente para organizar e deixar previsível!"},
  {n: 102, title:"HTML: Button", learn:"Button é a tag usada para interações diretas (enviar formulários, abrir modais), não para links.", metaphor:"O botão é como o interruptor de luz: você aperta e uma ação específica acontece na mesma hora.", q:"Qual é a principal função de um elemento <button>?", o:["Executar uma ação direta na própria página.","Navegar o usuário para outra URL ou site.","Alterar a cor de fundo apenas com o clique.","Guardar os dados permanentemente no banco."], a:0, tip:"Para navegar use <a>, para ações use <button>."},
@@ -44,7 +42,6 @@ function load(){
 }
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){}}
 
-// === SISTEMA DE AUDIO E SÍNTESE DE VOZ ===
 function initAudio(){
  try{
   if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
@@ -61,10 +58,9 @@ function playMusic() {
   let speed = 400;
   let type = "square";
   
-  // Três estilos procedurais super viciantes
-  if(currentMusicType === "1") { notes = [196,247,294,247,220,277,330,277]; speed = 250; type = "square"; } // Arcade Rápido
-  if(currentMusicType === "2") { notes = [110,110,146,110, 164,164,146,110]; speed = 400; type = "sawtooth"; } // Synthwave Bass
-  if(currentMusicType === "3") { notes = [329, 261, 392, 261, 329, 261, 440, 392]; speed = 300; type = "triangle"; } // Ação
+  if(currentMusicType === "1") { notes = [196,247,294,247,220,277,330,277]; speed = 250; type = "square"; }
+  if(currentMusicType === "2") { notes = [110,110,146,110, 164,164,146,110]; speed = 400; type = "sawtooth"; }
+  if(currentMusicType === "3") { notes = [329, 261, 392, 261, 329, 261, 440, 392]; speed = 300; type = "triangle"; }
   
   let i = 0;
   musicTimer = setInterval(() => {
@@ -90,7 +86,6 @@ function rightSound(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.1
 function wrongSound(){tone(170,.2,"sawtooth",.04);setTimeout(()=>tone(115,.3,"sawtooth",.04),100)}
 function breakSound(){tone(100, .5, "sawtooth", .1); setTimeout(()=>tone(50, .6, "square", .1), 200);}
 
-// === VOZ DO PRESTÍGIO ===
 function shoutPrestige(num) {
   if ('speechSynthesis' in window) {
     const msg = new SpeechSynthesisUtterance(`Prestígioooooooo ${num}!!!!!`);
@@ -102,13 +97,13 @@ function shoutPrestige(num) {
   }
 }
 
-// === STAFF LOGIN (ESCONDIDO) ===
 $("staff-trigger").addEventListener("click", () => {
   staffClicks++;
   if(staffClicks >= 5) {
     staffClicks = 0;
     const pwd = prompt("🕵️ STAFF LOGIN. Senha:");
-    if(pwd === "Velho2026") {
+    
+    if(pwd && btoa(pwd) === "TWpuaGFTZW5oYTEyMw==") {
       const lvl = prompt("Senha correta, Mestre! Qual nível você quer pular? (Digite 30, 60, 90 para testar prestígio):", "30");
       if(lvl) {
         state.done = Array.from({length: Number(lvl)}, (_, i) => i + 1);
@@ -117,7 +112,7 @@ $("staff-trigger").addEventListener("click", () => {
         alert(`Conta buffada para nível ${lvl}! Vá completar a última fase para ver a animação.`);
       }
     } else if (pwd !== null) {
-      alert("Senha Incorreta!");
+      alert("Acesso Negado! Você não é a Staff. 🚫");
     }
   }
 });
@@ -177,7 +172,6 @@ function renderPrestiges(){
 }
 
 function getQuestionObject(n) {
-  // Tenta achar a questão real. Se não existir, pega uma aleatória.
   const realQ = bank.find(x => x.n === n);
   return realQ ? realQ : bank[(n-1)%bank.length];
 }
@@ -191,7 +185,6 @@ function openLesson(n){
  $("lesson-learn").textContent=current.q.learn;
  $("lesson-metaphor").textContent=current.q.metaphor;
  
- // Suporte a imagem na lição
  if(current.q.img) { $("lesson-img").src = current.q.img; $("lesson-img").classList.remove("hidden"); }
  else { $("lesson-img").classList.add("hidden"); }
  
@@ -204,7 +197,6 @@ function startQuiz(){
  const q=current.q;
  $("question-text").textContent=q.q;
  
- // Suporte a imagem/video na Pergunta
  if(q.img) { $("quiz-img").src = q.img; $("quiz-img").classList.remove("hidden"); } else { $("quiz-img").classList.add("hidden"); }
  if(q.video) { $("quiz-video").src = q.video; $("quiz-video").classList.remove("hidden"); $("quiz-video").play(); } else { $("quiz-video").classList.add("hidden"); }
  
@@ -225,7 +217,7 @@ function check(){
  correct?rightSound():wrongSound();
  const f=$("feedback");f.classList.remove("hidden","wrong");if(!correct)f.classList.add("wrong");
  $("feedback-icon").textContent=correct?"🎉":"💡";
- $("feedback-title").textContent=correct?"ACERTOU!":"ERRROU!"; // Não entrega a resposta, só aponta o erro
+ $("feedback-title").textContent=correct?"ACERTOU!":"ERRROU!";
  $("feedback-tip").textContent=correct?"Mandou bem! "+current.q.tip:current.q.tip;
  $("next-btn").textContent=correct?"CONTINUAR →":"TENTAR DE NOVO ↻";
  if(correct){
@@ -240,7 +232,6 @@ function triggerPrestigeAnimation() {
   $("prestige-icon").style.color = COLORS[state.prestige-1];
   $("prestige-title").textContent = `PRESTÍGIO ${state.prestige} DESBLOQUEADO!`;
   
-  // Efeito Tremer Tela + Som de quebra + Voz
   document.body.classList.add("shake-screen");
   $("shatter-glass").classList.remove("hidden");
   breakSound();
@@ -257,7 +248,6 @@ function next(){
  if(!current)return;
  if(!state.done.includes(current.n)){startQuiz();return}
  
- // Lógica de prestígio
  if(current.n%30===0 && current.n/30>=state.prestige){
    state.prestige=Math.min(5,Math.floor(current.n/30)+1);
    save();
