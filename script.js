@@ -103,7 +103,7 @@ $("staff-trigger").addEventListener("click", () => {
     staffClicks = 0;
     const pwd = prompt("🕵️ STAFF LOGIN. Senha:");
     
-    if(pwd && btoa(pwd) === "NjcrNjcpODlub2Vsc2VhbmRlcnI=") {
+    if(pwd && btoa(pwd) === "Velho2026") {
       const lvl = prompt("Senha correta, Mestre! Qual nível você quer pular? (Digite 30, 60, 90 para testar prestígio):", "30");
       if(lvl) {
         state.done = Array.from({length: Number(lvl)}, (_, i) => i + 1);
