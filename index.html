@@ -4,25 +4,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>VelhoEscola — HTML & CSS</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 <div id="animated-bg"></div>
+<div id="shatter-glass" class="hidden"></div> <!-- Efeito de quebrar o vidro -->
 
 <section id="welcome-screen" class="welcome">
   <div class="welcome-icon">🎓</div>
-  <h1>BEM VINDOOOO!!!</h1>
+  <h1 class="neon-text">BEM VINDOOOO!!!</h1>
   <p>Sua jornada do zero ao avançado em HTML e CSS começa agora.</p>
-  <button id="enter-btn" class="game-btn primary">ENTRAR NA ESCOLA 🚀</button>
+  <button id="enter-btn" class="game-btn primary pulse">ENTRAR NA ESCOLA 🚀</button>
 </section>
 
 <div id="app" class="app hidden">
   <header class="topbar">
     <div>
-      <div class="logo">Velho<span>Escola</span></div>
+      <!-- Clique 5 vezes no 'Velho' para abrir o Login Staff -->
+      <div class="logo" id="staff-trigger">Velho<span>Escola</span></div>
       <small id="header-prestige">Prestígio 1</small>
     </div>
     <div class="top-actions">
+      <!-- Seletor de Músicas -->
+      <select id="music-select" class="music-selector">
+        <option value="1">🎵 Música 1 (Arcade)</option>
+        <option value="2">🎧 Música 2 (Neon)</option>
+        <option value="3">🎶 Música 3 (Ação)</option>
+        <option value="0">🔇 Mudo</option>
+      </select>
       <span class="streak">🔥 <b id="header-streak">0</b></span>
       <button id="reset-btn" class="icon-btn" title="Apagar progresso">🗑️</button>
     </div>
@@ -44,6 +53,8 @@
       <h2 id="lesson-title">Título</h2>
     </div>
     <section class="card">
+      <!-- Imagem ilustrativa da lição -->
+      <img id="lesson-img" class="media-preview hidden" src="" alt="Ilustração">
       <h3>📖 O que vamos aprender</h3>
       <p id="lesson-learn"></p>
       <div class="metaphor">
@@ -51,7 +62,7 @@
         <p id="lesson-metaphor"></p>
       </div>
     </section>
-    <button id="start-quiz-btn" class="game-btn primary">INICIAR DESAFIO 🎮</button>
+    <button id="start-quiz-btn" class="game-btn primary pulse">INICIAR DESAFIO 🎮</button>
   </main>
 
   <main id="screen-quiz" class="screen quiz-screen">
@@ -61,6 +72,9 @@
     </div>
     <div class="quiz-content">
       <h2 id="question-text">Pergunta?</h2>
+      <!-- Suporte a Imagem ou Vídeo na pergunta -->
+      <img id="quiz-img" class="media-preview hidden" src="" alt="Imagem da Questão">
+      <video id="quiz-video" class="media-preview hidden" controls loop muted></video>
       <div id="options-container"></div>
     </div>
     <button id="check-btn" class="game-btn primary" disabled>VERIFICAR ✓</button>
@@ -68,7 +82,7 @@
       <div id="feedback-icon" class="feedback-icon">🎉</div>
       <h2 id="feedback-title">Feedback</h2>
       <p id="feedback-tip"></p>
-      <button id="next-btn" class="game-btn">CONTINUAR →</button>
+      <button id="next-btn" class="game-btn pulse">CONTINUAR →</button>
     </div>
   </main>
 
@@ -97,13 +111,15 @@
   </nav>
 </div>
 
+<!-- Overlay do Prestígio (agora com animações insanas) -->
 <div id="prestige-overlay" class="overlay hidden">
-  <div class="prestige-key">🔑</div>
-  <h2>NOVO PRESTÍGIO! 👑</h2>
-  <p id="prestige-desc">Uma nova área foi desbloqueada.</p>
-  <button id="close-prestige" class="game-btn gold">CONTINUAR</button>
+  <div class="prestige-fx"></div>
+  <div class="prestige-key" id="prestige-icon">👑</div>
+  <h2 class="neon-text" id="prestige-title">PRESTÍGIO DESBLOQUEADO!</h2>
+  <p id="prestige-desc">Você destruiu a barreira e avançou!</p>
+  <button id="close-prestige" class="game-btn gold pulse">DOMINAR O PRÓXIMO NÍVEL</button>
 </div>
 
-<script src="script.js" defer></script>
+<script src="./js/script.js" defer></script>
 </body>
 </html>
