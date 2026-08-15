@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VelhoEscola - A Jornada HTML/CSS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050508;
+            --surface-color: rgba(28, 28, 36, 0.85);
+            
+            --prestige-1: #94a3b8;
+            --prestige-1-shadow: #475569;
+            --prestige-2: #22c55e;
+            --prestige-2-shadow: #166534;
+            --prestige-3: #3b82f6;
+            --prestige-3-shadow: #1e3a8a;
+            --prestige-4: #a855f7;
+            --prestige-4-shadow: #581c87;
+            --prestige-5: #f59e0b;
+            --prestige-5-shadow: #b45309;
+
+            --success: #10b981;
+            --success-shadow: #047857;
+            --error: #f43f5e;
+            --error-shadow: #be123c;
+            --text-main: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Nunito', 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: transparent;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            padding-bottom: 75px; /* Espaço para a barra inferior */
+        }
+
+        /* Fundo Animado */
+        #animated-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at top, #1a1a2e 0%, #050508 100%);
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            bottom: -50px;
+            opacity: 0;
+            animation: floatUp linear infinite;
+            user-select: none;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.4; }
+            100% { transform: translateY(-120vh) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+
+        .glass-card {
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-game {
+            color: white;
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-weight: 900;
+            font-size: 1.1rem;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .btn-game:active:not(:disabled) {
+            transform: translateY(5px);
+            box-shadow: 0 0 0 transparent !important;
+        }
+
+        .btn-game:disabled {
+            background-color: #3f3f46 !important;
+            box-shadow: 0 5px 0 #27272a !important;
+            color: #71717a !important;
+            cursor: not-allowed;
+        }
+
+        .btn-option {
+            background: var(--surface-color);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: var(--text-main);
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            text-align: left;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+            cursor: pointer;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .btn-option.selected {
+            transform: scale(1.02);
+            border-width: 2px;
+        }
+
+        .btn-option.wrong-anim {
+            animation: shake 0.4s;
+            border-color: var(--error) !important;
+            background-color: rgba(244, 63, 94, 0.15) !important;
+        }
+
+        .level-node {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px solid var(--bg-color);
+        }
+
+        .level-node:active:not(.locked) {
+            transform: scale(0.9) translateY(6px);
+            box-shadow: 0 0 0 transparent !important;
+        }
+
+        .locked {
+            background-color: #27272a;
+            box-shadow: 0 6px 0 #18181b;
+            color: #52525b;
+            cursor: not-allowed;
+            border-color: #18181b;
+        }
+
+        .feedback-banner {
+            position: absolute;
+            bottom: -150%;
+            left: 0;
+            width: 100%;
+            padding: 20px 20px 30px 20px;
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+        }
+
+        .feedback-banner.show { bottom: 0; }
+        .feedback-banner.correct { background-color: #064e3b; border-top: 3px solid var(--success); }
+        .feedback-banner.wrong { background-color: #4c0519; border-top: 3px solid var(--error); }
+
+        .btn-feedback {
+            border-radius: 16px;
+            padding: 16px 20px;
+            font-weight: 900;
+            font-size: 1.1rem;
+            text-align: center;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-feedback.correct { background-color: var(--success); color: white; box-shadow: 0 5px 0 var(--success-shadow); }
+        .btn-feedback.wrong { background-color: var(--error); color: white; box-shadow: 0 5px 0 var(--error-shadow); }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.1); opacity: 0; }
+            60% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        .animate-bounce-in { animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+
+        .screen { display: none; flex: 1; flex-direction: column; }
+        .screen.active { display: flex; }
+
+        /* Navegação Inferior (Tabs) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: rgba(15, 15, 19, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 50;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #71717a;
+            font-size: 0.75rem;
+            font-weight: 800;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color 0.2s;
+            text-transform: uppercase;
+        }
+
+        .nav-item.active {
+            color: var(--prestige-4);
+        }
+
+        .nav-item svg, .nav-item i {
+            font-size: 1.4rem;
+        }
+
+        /* Canvas de Confetti */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: none;
+        }
+
+        /* Overlay de Prestígio (Chave e Cadeado) */
+        #prestige-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 99;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Tela Inicial de Boas-Vindas */
+        #welcome-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #050508;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- BACKGROUND ANIMADO GLOBAL -->
+<div id="animated-bg"></div>
+
+<!-- TELA DE BOAS-VINDAS "BEM VINDOOOO!!!" -->
+<div id="welcome-screen">
+    <div class="absolute inset-0 pointer-events-none opacity-20 flex items-center justify-center">
+        <i class="fas fa-graduation-cap text-[250px] text-purple-600 animate-pulse"></i>
+    </div>
+    <div class="relative z-10 max-w-sm px-4">
+        <h1 class="text-5xl font-black text-white tracking-wider mb-3 animate-bounce-in drop-shadow-[0_0_25px_rgba(168,85,247,0.8)]" style="color: var(--prestige-4);">
+            BEM VINDOOOO!!!
+        </h1>
+        <p class="text-gray-300 font-bold text-lg mb-10 leading-relaxed">
+            Sua jornada épica do zero ao avançado em HTML e CSS vai começar. Prepare o seu cérebro de programador!
+        </p>
+        <button onclick="startAppWithAudio()" class="btn-game py-5 text-xl bg-purple-600 shadow-[0_8px_0_#581c87] border border-purple-400">
+            ENTRAR NA ESCOLA <i class="fas fa-rocket ml-2"></i>
+        </button>
+    </div>
+</div>
+
+<div class="app-container" id="app">
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Overlay de Animação de Prestígio (Chave & Cadeado) -->
+    <div id="prestige-overlay">
+        <div class="relative mb-6">
+            <i class="fas fa-lock text-6xl text-red-500 absolute -top-8 -left-8 animate-ping opacity-75"></i>
+            <i class="fas fa-key text-8xl text-yellow-400 animate-bounce drop-shadow-[0_0_30px_rgba(250,204,21,0.8)]"></i>
+        </div>
+        <h1 class="text-4xl font-black text-white uppercase tracking-widest mb-3" id="prestige-title">NOVO PRESTÍGIO DESBLOQUEADO!</h1>
+        <p class="text-xl font-bold text-yellow-300 mb-10" id="prestige-desc">A chave girou e um novo mundo de CSS foi aberto!</p>
+        <button onclick="closePrestige()" class="btn-game w-auto px-10 py-4 text-lg" id="prestige-btn" style="background-color: var(--prestige-5); box-shadow: 0 6px 0 var(--prestige-5-shadow);">
+            CONTINUAR
+        </button>
+    </div>
+
+    <!-- HEADER GLOBAL -->
+    <header class="flex justify-between items-center p-4 glass-card sticky top-0 z-40">
+        <div class="text-xl font-black italic tracking-wider flex flex-col">
+            <span style="color: var(--prestige-4); line-height: 1; text-shadow: 0 0 10px rgba(168,85,247,0.5);" id="logo-text">Velho<span class="text-white">Escola</span></span>
+            <span class="text-[11px] text-white/70 font-bold uppercase" id="header-prestige-text">Prestígio 1</span>
+        </div>
+        <div class="flex gap-4 font-bold items-center">
+            <div class="flex items-center gap-1 text-[#fbbf24] bg-black/40 px-3 py-1 rounded-full border border-white/10">
+                <i class="fas fa-fire text-orange-500 animate-pulse"></i>
+                <span id="header-streak" class="text-lg">0</span>
+            </div>
+            <button onclick="confirmReset()" class="text-gray-400 hover:text-red-500 p-2 transition drop-shadow-md">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- ABA 1: TRILHA PRINCIPAL -->
+    <main id="screen-map" class="screen active p-6 pb-24 overflow-y-auto relative scroll-smooth">
+        <div class="text-center mb-10 mt-4 glass-card p-6 rounded-3xl border-t border-white/20">
+            <i class="fas fa-map-marked-alt text-4xl text-purple-400 mb-3 drop-shadow-lg"></i>
+            <h1 class="text-2xl font-black text-white mb-2 uppercase tracking-wide">Trilha de Estudos</h1>
+            <p class="text-gray-300 text-sm font-bold">150 Níveis • 5 Prestígios</p>
+        </div>
+        <div id="path-container" class="relative flex flex-col items-center gap-12 py-4"></div>
+    </main>
+
+    <!-- ABA 2: PRESTÍGIOS ALCANÇADOS -->
+    <main id="screen-prestiges" class="screen p-6 pb-24 overflow-y-auto">
+        <div class="text-center mb-8 mt-2 glass-card p-6 rounded-3xl">
+            <i class="fas fa-crown text-4xl text-yellow-400 mb-3 drop-shadow-lg"></i>
+            <h1 class="text-2xl font-black text-white mb-2 uppercase tracking-wide">Galeria de Prestígios</h1>
+            <p class="text-gray-300 text-sm font-bold">Cada 30 níveis conquistados revelam um novo prestígio.</p>
+        </div>
+        <div id="prestiges-list" class="flex flex-col gap-4">
+            <!-- Gerado via JS -->
+        </div>
+    </main>
+
+    <!-- ABA 3: DASHBOARD / PROGRESSO GERAL -->
+    <main id="screen-dashboard" class="screen p-6 pb-24 overflow-y-auto">
+        <div class="text-center mb-8 mt-2 glass-card p-6 rounded-3xl">
+            <i class="fas fa-chart-line text-4xl text-green-400 mb-3 drop-shadow-lg"></i>
+            <h1 class="text-2xl font-black text-white mb-2 uppercase tracking-wide">Progresso Geral</h1>
+            <p class="text-gray-300 text-sm font-bold">Seu avanço rumo ao topo da engenharia web.</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-3xl mb-6 text-center">
+            <div class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Conclusão Total</div>
+            <div class="text-5xl font-black text-green-400 mb-4" id="progress-percent">0%</div>
+            <div class="h-4 bg-black/50 rounded-full overflow-hidden border border-white/10">
+                <div id="dashboard-bar" class="h-full bg-green-500 w-0 transition-all duration-500"></div>
+            </div>
+        </div>
+
+        <div class="glass-card p-6 rounded-3xl">
+            <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">Status de Todos os Níveis</h3>
+            <div id="levels-status-grid" class="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto p-2">
+                <!-- Gerado via JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- TELA 2: INTRODUÇÃO DA LIÇÃO (TEORIA) -->
+    <main id="screen-lesson-intro" class="screen p-6 pb-24 overflow-y-auto">
+        <button onclick="goHome()" class="text-gray-400 hover:text-white mb-6 self-start bg-black/50 p-3 rounded-full backdrop-blur-md border border-white/10"><i class="fas fa-arrow-left text-xl"></i></button>
+        
+        <div class="text-center mb-8">
+            <div class="inline-block px-4 py-1.5 rounded-full text-xs font-black mb-4 tracking-widest shadow-lg" id="lesson-badge">NÍVEL X</div>
+            <h2 id="lesson-title" class="text-4xl font-black text-white animate-bounce-in leading-tight drop-shadow-lg">Título</h2>
+        </div>
+        
+        <div class="glass-card rounded-3xl p-6 mb-8 relative overflow-hidden shadow-2xl">
+            <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-20 blur-2xl" id="lesson-glow"></div>
+            
+            <div class="mb-8 relative z-10">
+                <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <i class="fas fa-book-open text-blue-400"></i> O que vamos aprender
+                </h3>
+                <p id="lesson-learn" class="text-white text-lg leading-relaxed font-bold"></p>
+            </div>
+            
+            <div class="mb-6 relative z-10 p-5 bg-black/40 rounded-2xl border border-white/10 shadow-inner">
+                <h3 class="text-sm font-black text-yellow-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <i class="fas fa-lightbulb"></i> Metáfora da Casa
+                </h3>
+                <p id="lesson-metaphor" class="text-gray-200 leading-relaxed font-medium italic"></p>
+            </div>
+
+            <div id="lesson-media" class="media-container mt-6 relative z-10 flex flex-col gap-4"></div>
+        </div>
+
+        <div class="mt-auto pt-2 pb-6">
+            <button onclick="startQuiz()" class="btn-game py-5 text-xl shadow-[0_8px_0_rgba(0,0,0,0.5)]" id="btn-start-quiz">
+                INICIAR DESAFIO <i class="fas fa-gamepad ml-2"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- TELA 3: QUIZ -->
+    <main id="screen-quiz" class="screen flex-col justify-between overflow-hidden relative">
+        <div class="flex items-center gap-4 p-5 pt-6 glass-card border-b-0 rounded-b-3xl z-20">
+            <button onclick="abortQuiz()" class="text-gray-400 hover:text-red-400 transition"><i class="fas fa-times text-2xl"></i></button>
+            <div class="h-5 bg-black/50 rounded-full overflow-hidden w-full relative border border-white/10 shadow-inner">
+                <div id="quiz-progress" class="h-full w-0 transition-all duration-500 relative">
+                    <div class="absolute top-1 left-1 right-1 h-1.5 bg-white/30 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-6 pb-6 mt-6 z-10">
+            <h2 class="text-2xl font-black text-white mb-8 leading-snug drop-shadow-md bg-black/40 p-5 rounded-2xl border border-white/5" id="question-text">Pergunta?</h2>
+            <div id="options-container" class="flex flex-col gap-4"></div>
+        </div>
+
+        <div class="p-6 glass-card border-t border-white/10 rounded-t-3xl relative z-20">
+            <button id="btn-check" class="btn-game py-5 text-xl" disabled onclick="checkAnswer()">VERIFICAR <i class="fas fa-check-circle ml-2"></i></button>
+        </div>
+
+        <div id="feedback-banner" class="feedback-banner">
+            <div class="flex items-start gap-4">
+                <div id="feedback-icon" class="text-6xl mt-1 drop-shadow-xl"></div>
+                <div class="flex-1">
+                    <h3 id="feedback-title" class="text-3xl font-black mb-2 uppercase tracking-wide">Feedback</h3>
+                    <p id="feedback-desc" class="text-[16px] font-bold mb-4 opacity-90 leading-tight hidden"></p>
+                    <div id="feedback-tip" class="bg-black/40 rounded-xl p-4 text-sm flex items-start gap-3 border border-white/10 shadow-inner">
+                        <i class="fas fa-comment-dots text-yellow-400 mt-0.5 text-lg"></i>
+                        <span id="feedback-tip-text" class="font-bold text-white leading-relaxed">Dica aqui</span>
+                    </div>
+                </div>
+            </div>
+            <button id="btn-next" class="btn-feedback mt-4 py-5 text-xl" onclick="handleNextQuestion()">AVANÇAR <i class="fas fa-arrow-right ml-2"></i></button>
+        </div>
+    </main>
+
+    <!-- TELA 4: CONCLUSÃO DA LIÇÃO -->
+    <main id="screen-complete" class="screen p-6 pb-24 flex-col items-center justify-center text-center relative overflow-hidden">
+        <div class="absolute inset-0 pointer-events-none flex justify-center items-center opacity-10">
+            <i class="fas fa-certificate text-[300px] text-green-500 animate-spin-slow"></i>
+        </div>
+        
+        <div class="w-40 h-40 bg-green-500 rounded-full flex items-center justify-center mb-8 animate-bounce-in shadow-[0_0_50px_rgba(34,197,94,0.6)] border-4 border-white/20 z-10">
+            <i class="fas fa-check text-7xl text-white"></i>
+        </div>
+        
+        <h2 class="text-4xl font-black text-white mb-3 z-10 tracking-widest uppercase drop-shadow-lg">Nível Concluído!</h2>
+        <p class="text-green-400 mb-12 z-10 font-bold text-xl drop-shadow-md">Conhecimento absorvido com sucesso.</p>
+        
+        <div class="w-full z-10 pb-6 mt-auto">
+            <button onclick="finishAndReturnHome()" class="btn-game py-5 text-xl bg-green-500 shadow-[0_6px_0_#166534] border border-green-400">
+                CONTINUAR A JORNADA <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- NAVEGAÇÃO INFERIOR (TABS COM LIVRINHO) -->
+    <nav class="bottom-nav">
+        <button onclick="switchTab('map')" class="nav-item active" id="tab-map">
+            <i class="fas fa-book-open"></i>
+            <span>Revisão/Trilha</span>
+        </button>
+        <button onclick="switchTab('prestiges')" class="nav-item" id="tab-prestiges">
+            <i class="fas fa-crown"></i>
+            <span>Prestígios</span>
+        </button>
+        <button onclick="switchTab('dashboard')" class="nav-item" id="tab-dashboard">
+            <i class="fas fa-chart-pie"></i>
+            <span>Progresso</span>
+        </button>
+    </nav>
+
+</div>
+
+<script>
+    /* ================= SOM SINTÉTICO (BEM VINDOOOO!!! / TAM TAM) ================= */
+    function playWelcomeSound() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AudioContext();
+            
+            // Sequência "Tam, Tam, Tam..."
+            const notes = [261.63, 329.63, 392.00, 523.25]; // C4, E4, G4, C5
+            notes.forEach((freq, index) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.value = freq;
+                
+                gain.gain.setValueAtTime(0.2, ctx.currentTime + index * 0.2);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + index * 0.2 + 0.4);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start(ctx.currentTime + index * 0.2);
+                osc.stop(ctx.currentTime + index * 0.2 + 0.4);
+            });
+        } catch(e) {
+            console.log("Audio not supported or blocked");
+        }
+    }
+
+    function startAppWithAudio() {
+        playWelcomeSound();
+        const welcome = document.getElementById('welcome-screen');
+        welcome.style.opacity = '0';
+        welcome.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+            welcome.style.display = 'none';
+        }, 500);
+    }
+
+    /* ================= BACKGROUND ANIMADO ================= */
+    function initBackground() {
+        const bg = document.getElementById('animated-bg');
+        const symbols = ['</>', '{}', '#', ';', '*', '()', 'div', 'css', '[]'];
+        for(let i = 0; i < 35; i++) {
+            let p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDuration = (Math.random() * 20 + 15) + 's';
+            p.style.animationDelay = (Math.random() * 10) + 's';
+            
+            if(Math.random() > 0.6) {
+                p.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+                p.style.color = 'rgba(255,255,255,0.12)';
+                p.style.fontSize = (Math.random() * 24 + 10) + 'px';
+                p.style.fontWeight = 'bold';
+            } else {
+                let size = Math.random() * 3 + 1;
+                p.style.width = size + 'px';
+                p.style.height = size + 'px';
+                p.style.background = 'white';
+                p.style.borderRadius = '50%';
+                p.style.boxShadow = '0 0 ' + (size*3) + 'px rgba(255,255,255,0.8)';
+            }
+            bg.appendChild(p);
+        }
+    }
+    initBackground();
+
+    /* ================= DADOS E 150 NÍVEIS ================= */
+    const levelTitles = [
+        "Primeiro HTML", "Documento HTML", "DOCTYPE", "html lang", "head e body", "Títulos h1–h6", "Parágrafos", "Quebras e separadores", "Comentários", "Ênfase e importância", "Links", "Âncoras", "Imagens", "Texto alternativo", "Caminhos de arquivos", "Listas não ordenadas", "Listas ordenadas", "Listas de descrição", "div", "span", "Classes", "IDs", "Agrupamento semântico", "header", "nav", "main", "section", "article", "aside", "footer",
+        "Estrutura semântica", "Primeiro CSS", "CSS inline", "CSS interno", "CSS externo", "Seletores de elemento", "Seletores de classe", "Seletores de ID", "Descendentes", "Filhos diretos", "Atributos", "Pseudo-classes", "Hover", "Focus", "Active", "Pseudo-elementos", "Cores", "Unidades", "Tipografia", "Font-family", "Font-size", "Font-weight", "Line-height", "Text-align", "Background", "Border", "Border-radius", "Box model", "Margin", "Padding",
+        "Width e height", "Display block", "Display inline", "Inline-block", "Flexbox eixo principal", "Flexbox eixo cruzado", "Gap", "Justify-content", "Align-items", "Flex-wrap", "Flex-basis", "Flex-grow", "Flex-shrink", "Grid básico", "Grid columns", "Grid rows", "Gap no Grid", "Grid areas", "Position relative", "Position absolute", "Position fixed", "Position sticky", "Z-index", "Overflow", "Object-fit", "Aspect-ratio", "Media queries", "Mobile-first", "Breakpoints", "Unidades responsivas",
+        "Clamp", "HTML semântico avançado", "Formulários", "Label", "Input types", "Textarea", "Select", "Fieldset", "Legend", "Required", "Pattern", "Button", "Tabelas", "Caption", "Thead tbody tfoot", "Scope em tabelas", "Audio", "Video", "Details summary", "Dialog", "Data attributes", "CSS variables", "Cascade", "Especificidade", "Inheritance", "@font-face", "Transitions", "Transforms", "Animations", "Keyframes",
+        "Prefers-reduced-motion", "Arquitetura de CSS", "BEM", "Reset e normalização", "Design tokens", "Componentes reutilizáveis", "Estados de interface", "Acessibilidade visual", "Foco de teclado", "Contraste", "Semântica + acessibilidade", "Formulário acessível", "Imagens responsivas", "picture", "srcset", "Lazy loading", "Performance de CSS", "CSS nesting", "Container queries", "Cascade layers", "@supports", "Print CSS", "Dark mode", "Prefers-color-scheme", "SEO básico no HTML", "Meta viewport", "Open Graph", "Estrutura de landing page", "Página de portfólio", "Página de documentação"
+    ];
+
+    const prestigeData = [
+        { name: "Prestígio 1: A Fundação", color: "var(--prestige-1)", shadow: "var(--prestige-1-shadow)", icon: "fa-hammer", hex: "94a3b8" },
+        { name: "Prestígio 2: A Decoração", color: "var(--prestige-2)", shadow: "var(--prestige-2-shadow)", icon: "fa-paint-roller", hex: "22c55e" },
+        { name: "Prestígio 3: A Planta", color: "var(--prestige-3)", shadow: "var(--prestige-3-shadow)", icon: "fa-ruler-combined", hex: "3b82f6" },
+        { name: "Prestígio 4: A Oficina", color: "var(--prestige-4)", shadow: "var(--prestige-4-shadow)", icon: "fa-cogs", hex: "a855f7" },
+        { name: "Prestígio 5: A Profissão", color: "var(--prestige-5)", shadow: "var(--prestige-5-shadow)", icon: "fa-laptop-code", hex: "f59e0b" }
+    ];
+
+    function generateQuestionsForLevel(topic) {
+        return [
+            {
+                text: `Qual é a melhor descrição da funcionalidade: ${topic}?`,
+                options: [
+                    `Elemento crucial no ecossistema Web para estruturar e organizar: ${topic}.`,
+                    `Uma ferramenta exclusiva para programação Backend.`,
+                    `Um formato de banco de dados SQL estruturado.`,
+                    `Uma linguagem de programação autônoma.`
+                ],
+                correct: 0,
+                tip: `Foque no papel do HTML/CSS. Pense na utilidade de ${topic} para a interface.`
+            },
+            {
+                text: `Complete a lógica: O HTML constrói, o CSS embeleza. Como ${topic} atua nessa lógica?`,
+                options: [
+                    `Cumpre exatamente seu papel na semântica, estrutura ou estilização da página.`,
+                    `Gerencia rotas de servidor Node.js.`,
+                    `Controla hardware do celular.`,
+                    `Aplica inteligência artificial aos dados.`
+                ],
+                correct: 0,
+                tip: `Lembre-se da metáfora da casa: Alicerce, Tijolos e Pintura.`
+            },
+            {
+                text: `Julgue: Entender o funcionamento exato de "${topic}" é vital mesmo usando frameworks.`,
+                options: ["Verdadeiro. Os frameworks dependem da base para customizações precisas.", "Falso. O framework faz tudo sozinho.", "Falso. Apenas JS importa.", "Verdadeiro, apenas para IE."],
+                correct: 0,
+                tip: `A base nunca muda. Uma casa forte precisa de bons fundamentos.`
+            },
+            {
+                text: `Qual seria a ordem de pensamento ao lidar com ${topic}?`,
+                options: [
+                    `Planejar estrutura → aplicar e testar no navegador → revisar → finalizar estilo.`,
+                    `Estilizar no escuro → publicar sem testar.`,
+                    `Apagar o código e desistir.`,
+                    `Copiar da internet e ignorar as tags.`
+                ],
+                correct: 0,
+                tip: `Testar no navegador durante o desenvolvimento é o segredo.`
+            },
+            {
+                text: `No VelhoEscola, qual o conselho máximo para dominar ${topic}?`,
+                options: [
+                    `Entender o conceito → Explicar com suas palavras → Praticar e Revisar.`,
+                    `Decorar o código sem entender.`,
+                    `Baixar templates pagos cegamente.`,
+                    `Nunca usar.`
+                ],
+                correct: 0,
+                tip: `A regra de aprendizagem do VelhoEscola foca no entendimento real.`
+            }
+        ];
+    }
+
+    let courseData = [];
+    levelTitles.forEach((title, index) => {
+        const levelNum = index + 1;
+        const prestigeIndex = Math.floor(index / 30);
+        let metaphorBase = levelNum <= 30 ? "O HTML é o alicerce da casa." : (levelNum <= 60 ? "O CSS é a pintura e decoração." : (levelNum <= 90 ? "O layout é a planta da casa." : "Você virou mestre de obras."));
+        
+        courseData.push({
+            id: `lvl-${levelNum}`,
+            title: `${levelNum}. ${title}`,
+            prestigeIndex: prestigeIndex,
+            lesson: {
+                learn: `📚 Explicação: Vamos aprender como se estivéssemos montando uma casa. Imagine que ${title} é uma peça dessa casa. Primeiro descobrimos para que ela serve, depois vemos um exemplo e respondemos.`,
+                objective: `Aprender ${title} como parte fundamental da estrutura e semântica web.`,
+                metaphor: `Imagine uma casa. ${metaphorBase} Hoje, a peça principal é ${title}.`,
+                image: `https://placehold.co/1200x650/${prestigeData[prestigeIndex].hex}/1c1c24/png?text=VelhoEscola+${title.replace(/\s+/g, '+')}+HTML+CSS`,
+                video: "https://www.youtube.com/watch?v=sj0p9O85AIg"
+            },
+            questions: generateQuestionsForLevel(title)
+        });
+    });
+
+    /* ================= ESTADO DO JOGADOR ================= */
+    let userProgress = { level: 1, streak: 0 };
+    let currentState = {
+        levelObj: null,
+        currentQuestionIndex: 0,
+        selectedOptionBtn: null,
+        isAnswerChecked: false,
+        isReviewMode: false
+    };
+
+    function initApp() {
+        const savedData = localStorage.getItem('velhoEscolaProgressFull_V3');
+        if (savedData) {
+            userProgress = JSON.parse(savedData);
+        }
+        updateHeaderStats();
+        renderMap();
+        renderPrestigesTab();
+        renderDashboardTab();
+    }
+
+    function saveProgress() {
+        localStorage.setItem('velhoEscolaProgressFull_V3', JSON.stringify(userProgress));
+        updateHeaderStats();
+        renderPrestigesTab();
+        renderDashboardTab();
+    }
+
+    function confirmReset() {
+        if(confirm("🗑️ Deseja apagar todo o progresso e reiniciar a jornada?")) {
+            localStorage.removeItem('velhoEscolaProgressFull_V3');
+            userProgress = { level: 1, streak: 0 };
+            updateHeaderStats();
+            renderMap();
+            renderPrestigesTab();
+            renderDashboardTab();
+            switchTab('map');
+        }
+    }
+
+    function updateHeaderStats() {
+        document.getElementById('header-streak').innerText = userProgress.level - 1;
+        const currentPrestige = Math.min(5, Math.floor((userProgress.level - 1) / 30) + 1);
+        const pData = prestigeData[currentPrestige - 1];
+        
+        document.getElementById('header-prestige-text').innerText = pData.name;
+        document.getElementById('logo-text').style.color = pData.color;
+        document.getElementById('logo-text').style.textShadow = `0 0 15px ${pData.color}80`;
+    }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        window.scrollTo(0, 0);
+    }
+
+    function switchTab(tabName) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        if(tabName === 'map') {
+            document.getElementById('tab-map').classList.add('active');
+            showScreen('screen-map');
+            renderMap();
+        } else if(tabName === 'prestiges') {
+            document.getElementById('tab-prestiges').classList.add('active');
+            showScreen('screen-prestiges');
+            renderPrestigesTab();
+        } else if(tabName === 'dashboard') {
+            document.getElementById('tab-dashboard').classList.add('active');
+            showScreen('screen-dashboard');
+            renderDashboardTab();
+        }
+    }
+
+    /* ================= RENDERIZAÇÃO DO MAPA (TRILHA COM CADEADOS) ================= */
+    function renderMap() {
+        const pathContainer = document.getElementById('path-container');
+        pathContainer.innerHTML = '';
+        
+        let currentPrestige = -1;
+
+        courseData.forEach((level, index) => {
+            const levelNum = index + 1;
+            const prestigeIdx = level.prestigeIndex;
+            const pData = prestigeData[prestigeIdx];
+
+            // Cabeçalho do Prestígio
+            if (prestigeIdx !== currentPrestige) {
+                currentPrestige = prestigeIdx;
+                const isUnlocked = userProgress.level >= (prestigeIdx * 30 + 1);
+                
+                const header = document.createElement('div');
+                header.className = 'w-full z-10 px-6 mt-10 mb-6';
+                header.innerHTML = `
+                    <div class="flex items-center justify-center border-b-4 pb-4 rounded-3xl backdrop-blur-md" 
+                         style="border-color: ${isUnlocked ? pData.color : '#27272a'}; background: ${isUnlocked ? pData.color+'15' : 'rgba(28, 28, 36, 0.5)'};">
+                        <h3 class="text-xl font-black uppercase tracking-widest drop-shadow-md flex items-center gap-2" style="color: ${isUnlocked ? pData.color : '#52525b'};">
+                            <i class="fas ${isUnlocked ? pData.icon : 'fa-lock'}"></i> ${pData.name} ${!isUnlocked ? '(Bloqueado)' : ''}
+                        </h3>
+                    </div>
+                `;
+                pathContainer.appendChild(header);
+            }
+
+            const isCompleted = levelNum < userProgress.level;
+            const isActive = levelNum === userProgress.level;
+            const isLocked = levelNum > userProgress.level;
+
+            const offsetX = (index % 2 === 0) ? '-45px' : '45px';
+            
+            let nodeClass = 'locked';
+            let iconClass = 'fa-lock';
+            let bgColor = '#27272a';
+            let shadowColor = '#18181b';
+            let pulseAnim = '';
+
+            if (isCompleted) {
+                nodeClass = 'completed';
+                iconClass = 'fa-check';
+                bgColor = pData.color;
+                shadowColor = pData.shadow;
+            } else if (isActive) {
+                nodeClass = 'active';
+                iconClass = 'fa-star';
+                bgColor = pData.color;
+                shadowColor = pData.shadow;
+                pulseAnim = `animation: pulse-ring 2s infinite; box-shadow: 0 8px 0 ${shadowColor}, 0 0 0 0 rgba(255,255,255,0.7);`;
+            } else if (isLocked) {
+                // Níveis futuros ficam completamente ocultos / apenas com cadeado genérico e sem número revelado
+                iconClass = 'fa-lock';
+                bgColor = '#1c1c24';
+                shadowColor = '#0f0f13';
+            }
+
+            const isBoss = (levelNum % 30 === 0);
+            if(isBoss && (isActive || isCompleted)) {
+                iconClass = 'fa-crown';
+            }
+
+            const nodeHtml = `
+                <div class="level-node ${nodeClass}" 
+                     style="transform: translateX(${offsetX}); background-color: ${bgColor}; box-shadow: 0 8px 0 ${shadowColor}; ${pulseAnim}"
+                     onclick="handleNodeClick(${index}, ${isLocked})">
+                    <i class="fas ${iconClass} text-white drop-shadow-lg"></i>
+                    ${isActive ? `<div class="absolute -top-14 bg-white text-black text-sm font-black py-2 px-5 rounded-full animate-bounce z-20 whitespace-nowrap shadow-2xl border-4" style="border-color: ${pData.color}">NÍVEL ${levelNum}</div>` : ''}
+                </div>
+            `;
+            pathContainer.insertAdjacentHTML('beforeend', nodeHtml);
+            
+            if (index < courseData.length - 1) {
+                const nextIsUnlocked = (index + 2) <= userProgress.level;
+                const lineColor = nextIsUnlocked ? pData.color : '#27272a';
+                const isLeftToRight = index % 2 === 0;
+                const lineRotation = isLeftToRight ? 'rotate(45deg)' : 'rotate(-45deg)';
+                const lineLeft = isLeftToRight ? 'calc(50% - 30px)' : 'calc(50% - 30px)';
+                
+                const lineHtml = `
+                    <div class="w-2 h-20 absolute -z-10 rounded-full opacity-60" 
+                         style="background-color: ${lineColor}; transform: ${lineRotation}; margin-top: 60px; left: ${lineLeft};">
+                    </div>
+                `;
+                pathContainer.insertAdjacentHTML('beforeend', lineHtml);
+            }
+        });
+    }
+
+    function handleNodeClick(levelIndex, isLocked) {
+        if (isLocked) {
+            alert("🔒 Este nível está trancado por um cadeado! Complete os anteriores para avançar.");
+            return;
+        }
+        
+        currentState.levelObj = courseData[levelIndex];
+        currentState.currentQuestionIndex = 0;
+        
+        // Se o nível já foi concluído, entra em MODO REVISÃO (não responde quiz)
+        const levelNum = levelIndex + 1;
+        currentState.isReviewMode = (levelNum < userProgress.level);
+        
+        renderLessonIntro();
+    }
+
+    function renderPrestigesTab() {
+        const container = document.getElementById('prestiges-list');
+        container.innerHTML = '';
+        
+        const currentPrestigeIdx = Math.floor((userProgress.level - 1) / 30);
+
+        prestigeData.forEach((p, idx) => {
+            const isUnlocked = idx <= currentPrestigeIdx;
+            container.innerHTML += `
+                <div class="glass-card p-5 rounded-3xl border-2 flex items-center gap-4" style="border-color: ${isUnlocked ? p.color : '#3f3f46'}">
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0 shadow-lg" style="background-color: ${isUnlocked ? p.color : '#27272a'}; color: white;">
+                        <i class="fas ${isUnlocked ? p.icon : 'fa-lock'}"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-xs font-black uppercase text-gray-400">Prestígio ${idx + 1}</div>
+                        <h3 class="text-lg font-black text-white">${p.name.split(': ')[1]}</h3>
+                        <p class="text-xs text-gray-300 font-bold mt-1">${isUnlocked ? '✅ Conquistado e Desbloqueado' : '🔒 Trancado (Alcance nível ' + (idx*30 + 1) + ')'}</p>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function renderDashboardTab() {
+        const completedCount = userProgress.level - 1;
+        const totalLevels = 150;
+        const percent = Math.min(100, Math.round((completedCount / totalLevels) * 100));
+
+        document.getElementById('progress-percent').innerText = percent + '%';
+        document.getElementById('dashboard-bar').style.width = percent + '%';
+
+        const grid = document.getElementById('levels-status-grid');
+        grid.innerHTML = '';
+
+        for(let i = 1; i <= totalLevels; i++) {
+            const isDone = i < userProgress.level;
+            const isCurrent = i === userProgress.level;
+            
+            let bg = '#18181b';
+            let text = '#52525b';
+            let icon = 'fa-lock';
+
+            if(isDone) {
+                bg = 'rgba(16, 185, 129, 0.2)';
+                text = '#10b981';
+                icon = 'fa-check';
+            } else if(isCurrent) {
+                bg = 'rgba(168, 85, 247, 0.3)';
+                text = '#a855f7';
+                icon = 'fa-star';
+            }
+
+            grid.innerHTML += `
+                <div class="p-2 rounded-xl flex flex-col items-center justify-center border border-white/5 text-xs font-bold" style="background: ${bg}; color: ${text};">
+                    <i class="fas ${icon} mb-1"></i>
+                    <span>${i}</span>
+                </div>
+            `;
+        }
+    }
+
+    function renderLessonIntro() {
+        const lvl = currentState.levelObj;
+        const pData = prestigeData[lvl.prestigeIndex];
+        
+        document.getElementById('lesson-badge').innerText = `NÍVEL ${lvl.id.split('-')[1]} ${currentState.isReviewMode ? '(MODO REVISÃO)' : ''}`;
+        document.getElementById('lesson-badge').style.backgroundColor = pData.color;
+        document.getElementById('lesson-badge').style.color = '#fff';
+        
+        document.getElementById('lesson-title').innerText = lvl.title.split('. ')[1];
+        document.getElementById('lesson-title').style.color = pData.color;
+        document.getElementById('lesson-glow').style.backgroundColor = pData.color;
+        
+        document.getElementById('lesson-learn').innerText = lvl.lesson.learn + " " + lvl.lesson.objective;
+        document.getElementById('lesson-metaphor').innerText = lvl.lesson.metaphor;
+        
+        const mediaContainer = document.getElementById('lesson-media');
+        mediaContainer.innerHTML = '';
+        if(lvl.lesson.image) mediaContainer.innerHTML += `<img src="${lvl.lesson.image}" alt="Ilustração" />`;
+        if(lvl.lesson.video) {
+            mediaContainer.innerHTML += `
+                <a href="${lvl.lesson.video}" target="_blank" class="w-full bg-[#ef4444] text-white p-4 rounded-xl font-black flex items-center justify-center gap-3 uppercase shadow-md">
+                    <i class="fab fa-youtube text-2xl"></i> Assistir Explicação
+                </a>
+            `;
+        }
+
+        const btnStart = document.getElementById('btn-start-quiz');
+        if (currentState.isReviewMode) {
+            btnStart.innerHTML = `APENAS REVISÃO (VOLTAR) <i class="fas fa-arrow-left ml-2"></i>`;
+        } else {
+            btnStart.innerHTML = `INICIAR DESAFIO <i class="fas fa-gamepad ml-2"></i>`;
+        }
+        btnStart.style.backgroundColor = pData.color;
+        btnStart.style.boxShadow = `0 8px 0 ${pData.shadow}`;
+
+        showScreen('screen-lesson-intro');
+    }
+
+    function startQuiz() {
+        if (currentState.isReviewMode) {
+            goHome();
+            return;
+        }
+        currentState.currentQuestionIndex = 0;
+        renderQuestion();
+        showScreen('screen-quiz');
+    }
+
+    function abortQuiz() {
+        if (confirm("Deseja sair do desafio?")) goHome();
+    }
+
+    function renderQuestion() {
+        const lvl = currentState.levelObj;
+        const qIndex = currentState.currentQuestionIndex;
+        const question = lvl.questions[qIndex];
+        const pData = prestigeData[lvl.prestigeIndex];
+        
+        currentState.selectedOptionBtn = null;
+        currentState.isAnswerChecked = false;
+
+        const progressPercentage = (qIndex / lvl.questions.length) * 100;
+        const progFill = document.getElementById('quiz-progress');
+        progFill.style.width = `${progressPercentage}%`;
+        progFill.style.backgroundColor = pData.color;
+
+        document.getElementById('feedback-banner').classList.remove('show', 'correct', 'wrong');
+
+        const btnCheck = document.getElementById('btn-check');
+        btnCheck.innerHTML = `VERIFICAR <i class="fas fa-check-circle ml-2"></i>`;
+        btnCheck.disabled = true;
+        btnCheck.style.backgroundColor = pData.color;
+        btnCheck.style.boxShadow = `0 6px 0 ${pData.shadow}`;
+
+        document.getElementById('question-text').innerText = question.text;
+        
+        const optsContainer = document.getElementById('options-container');
+        optsContainer.innerHTML = '';
+        
+        let optionsMap = question.options.map((opt, idx) => ({ text: opt, isCorrect: idx === question.correct }));
+        optionsMap.sort(() => Math.random() - 0.5); 
+
+        optionsMap.forEach((optData, newIndex) => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.dataset.correct = optData.isCorrect;
+            btn.innerHTML = `
+                <span class="w-10 h-10 rounded-full border-2 border-[#3f3f46] flex items-center justify-center mr-4 text-gray-400 font-black shrink-0">${newIndex + 1}</span> 
+                <span class="text-left font-bold text-gray-200 leading-snug">${optData.text}</span>
+            `;
+            btn.onclick = () => selectOption(btn);
+            optsContainer.appendChild(btn);
+        });
+    }
+
+    function selectOption(btnElement) {
+        if (currentState.isAnswerChecked) return;
+        const pData = prestigeData[currentState.levelObj.prestigeIndex];
+
+        document.querySelectorAll('.btn-option').forEach(b => {
+            b.classList.remove('selected');
+            b.style.borderColor = 'rgba(255,255,255,0.1)';
+            b.style.backgroundColor = 'var(--surface-color)';
+            let num = b.querySelector('span:first-child');
+            num.style.borderColor = '#3f3f46';
+            num.style.color = '#9ca3af';
+            num.style.backgroundColor = 'transparent';
+        });
+        
+        btnElement.classList.add('selected');
+        btnElement.style.borderColor = pData.color;
+        btnElement.style.backgroundColor = `${pData.color}20`; 
+        
+        let numberIcon = btnElement.querySelector('span:first-child');
+        numberIcon.style.borderColor = pData.color;
+        numberIcon.style.color = pData.color;
+        numberIcon.style.backgroundColor = `${pData.color}40`;
+
+        currentState.selectedOptionBtn = btnElement;
+        document.getElementById('btn-check').disabled = false;
+    }
+
+    function checkAnswer() {
+        const question = currentState.levelObj.questions[currentState.currentQuestionIndex];
+        const banner = document.getElementById('feedback-banner');
+        const title = document.getElementById('feedback-title');
+        const tipText = document.getElementById('feedback-tip-text');
+        const icon = document.getElementById('feedback-icon');
+        const btnNext = document.getElementById('btn-next');
+        const btnCheck = document.getElementById('btn-check');
+        const pData = prestigeData[currentState.levelObj.prestigeIndex];
+
+        if (currentState.isAnswerChecked) {
+            banner.classList.remove('show');
+            currentState.isAnswerChecked = false;
+            btnCheck.innerHTML = `VERIFICAR <i class="fas fa-check-circle ml-2"></i>`;
+            btnCheck.disabled = true;
+            btnCheck.style.backgroundColor = pData.color;
+            btnCheck.style.boxShadow = `0 6px 0 ${pData.shadow}`;
+            
+            if(currentState.selectedOptionBtn) {
+                currentState.selectedOptionBtn.classList.remove('wrong-anim');
+                currentState.selectedOptionBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+                currentState.selectedOptionBtn.style.backgroundColor = 'var(--surface-color)';
+                currentState.selectedOptionBtn = null;
+            }
+            return;
+        }
+
+        const isCorrect = currentState.selectedOptionBtn.dataset.correct === "true";
+        currentState.isAnswerChecked = true;
+
+        banner.classList.remove('correct', 'wrong');
+        btnNext.classList.remove('correct', 'wrong');
+
+        if (isCorrect) {
+            banner.classList.add('correct');
+            btnNext.classList.add('correct');
+            btnNext.innerHTML = `AVANÇAR <i class="fas fa-arrow-right ml-2"></i>`;
+            btnNext.style.display = "block";
+            btnCheck.style.display = "none";
+
+            title.innerText = "ESPETACULAR!";
+            title.style.color = 'white';
+            icon.innerHTML = '<i class="fas fa-check-circle text-green-400 bg-white rounded-full"></i>';
+            tipText.innerText = "Excelente! Alicerce firme e forte.";
+            currentState.selectedOptionBtn.style.borderColor = 'var(--success)';
+            currentState.selectedOptionBtn.style.backgroundColor = 'rgba(16, 185, 129, 0.2)';
+        } else {
+            banner.classList.add('wrong');
+            btnNext.style.display = "none";
+            btnCheck.innerHTML = `TENTAR NOVAMENTE <i class="fas fa-redo ml-2"></i>`;
+            btnCheck.style.backgroundColor = 'var(--error)';
+            btnCheck.style.boxShadow = `0 6px 0 var(--error-shadow)`;
+            btnCheck.disabled = false;
+
+            title.innerText = "Atenção na Obra...";
+            title.style.color = 'white';
+            icon.innerHTML = '<i class="fas fa-exclamation-triangle text-red-400 bg-white rounded-full"></i>';
+            tipText.innerText = question.tip; // Exibe somente a dica!
+            currentState.selectedOptionBtn.classList.add('wrong-anim');
+            currentState.selectedOptionBtn.style.borderColor = 'var(--error)';
+            currentState.selectedOptionBtn.style.backgroundColor = 'rgba(244, 63, 94, 0.2)';
+        }
+        banner.classList.add('show');
+    }
+
+    function handleNextQuestion() {
+        const lvl = currentState.levelObj;
+        currentState.currentQuestionIndex++;
+        document.getElementById('btn-check').style.display = "flex"; 
+        
+        if (currentState.currentQuestionIndex >= lvl.questions.length) {
+            finishActivity();
+        } else {
+            renderQuestion();
+        }
+    }
+
+    function finishActivity() {
+        const lvl = currentState.levelObj;
+        const lvlNum = parseInt(lvl.id.split('-')[1]);
+
+        document.getElementById('quiz-progress').style.width = `100%`;
+        document.getElementById('feedback-banner').classList.remove('show');
+        
+        if (lvlNum === userProgress.level) {
+            userProgress.level++;
+            saveProgress();
+        }
+
+        // Se completou o último nível de um prestígio (ex: 30, 60...) dispara chave e cadeado
+        if (lvlNum % 30 === 0 && lvlNum === (userProgress.level - 1)) {
+            triggerPrestigeCelebration(lvl.prestigeIndex);
+        } else {
+            showScreen('screen-complete');
+        }
+    }
+
+    /* ================= ANIMAÇÃO DE CHAVE E CADEADO (PRESTÍGIO) ================= */
+    function triggerPrestigeCelebration(prestigeIndex) {
+        const newPrestigeIdx = Math.min(4, prestigeIndex + 1);
+        const pData = prestigeData[newPrestigeIdx];
+        const overlay = document.getElementById('prestige-overlay');
+        const title = document.getElementById('prestige-title');
+        const btn = document.getElementById('prestige-btn');
+        const canvas = document.getElementById('confetti-canvas');
+        
+        title.innerText = `NOVO PRESTÍGIO: ${pData.name.split(': ')[1]}!`;
+        title.style.color = pData.color;
+        
+        btn.style.backgroundColor = pData.color;
+        btn.style.boxShadow = `0 6px 0 ${pData.shadow}`;
+        
+        overlay.style.display = 'flex';
+        canvas.style.display = 'block';
+        fireConfetti(pData.color);
+    }
+
+    function closePrestige() {
+        document.getElementById('prestige-overlay').style.display = 'none';
+        document.getElementById('confetti-canvas').style.display = 'none';
+        finishAndReturnHome();
+    }
+
+    function finishAndReturnHome() {
+        renderMap(); 
+        goHome();
+    }
+
+    function goHome() {
+        switchTab('map');
+    }
+
+    /* ================= MOTOR DE CONFETTI ================= */
+    let confettiParticles = [];
+    let confettiCtx = null;
+    let W, H;
+
+    function fireConfetti(dominantColor) {
+        const canvas = document.getElementById('confetti-canvas');
+        confettiCtx = canvas.getContext('2d');
+        W = window.innerWidth;
+        H = window.innerHeight;
+        canvas.width = W;
+        canvas.height = H;
+        
+        confettiParticles = [];
+        const colors = [dominantColor, '#ffffff', '#fbbf24', '#60a5fa'];
+        
+        for (let i = 0; i < 150; i++) {
+            confettiParticles.push({
+                x: W / 2,
+                y: H / 2,
+                r: Math.random() * 8 + 4,
+                dx: Math.random() * 26 - 13,
+                dy: Math.random() * -25 - 8,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                tilt: Math.random() * 10,
+                tiltAngle: 0,
+                tiltAngleInc: (Math.random() * 0.1) + 0.05
+            });
+        }
+        requestAnimationFrame(renderConfetti);
+    }
+
+    function renderConfetti() {
+        if (!confettiCtx) return;
+        confettiCtx.clearRect(0, 0, W, H);
+        let activeCount = 0;
+        
+        confettiParticles.forEach(p => {
+            p.tiltAngle += p.tiltAngleInc;
+            p.y += (Math.cos(p.tiltAngle) + 1 + p.r / 2) / 2;
+            p.x += Math.sin(p.tiltAngle) * 2 + p.dx;
+            p.dy += 0.3;
+            p.y += p.dy;
+            
+            if (p.y <= H) activeCount++;
+
+            confettiCtx.beginPath();
+            confettiCtx.lineWidth = p.r;
+            confettiCtx.strokeStyle = p.color;
+            confettiCtx.moveTo(p.x + p.tilt + p.r, p.y);
+            confettiCtx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+            confettiCtx.stroke();
+        });
+
+        if (activeCount > 0 && document.getElementById('confetti-canvas').style.display === 'block') {
+            requestAnimationFrame(renderConfetti);
+        }
+    }
+</script>
+</body>
+</html>
