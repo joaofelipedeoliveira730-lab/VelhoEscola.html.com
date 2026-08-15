@@ -1,160 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#050508">
-  <title>VelhoEscola — Jornada HTML & CSS</title>
-
-  <!-- GitHub Pages/CDN: TailwindCSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- GitHub Pages/CDN: Font Awesome -->
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VelhoEscola — HTML & CSS</title>
+<link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-  <div id="animated-bg" aria-hidden="true"></div>
+<div id="animated-bg"></div>
 
-  <div id="welcome-screen">
-    <div class="welcome-glow"></div>
-    <i class="fas fa-graduation-cap welcome-icon"></i>
-    <div class="welcome-content">
-      <div class="eyebrow">VELHOESCOLA</div>
-      <h1>BEM VINDOOOO!!!</h1>
-      <p>Uma jornada do zero ao avançado em HTML e CSS. Aprenda, erre, tente de novo e conquiste seu próximo prestígio.</p>
-      <button id="btn-enter" class="btn-game btn-purple">
-        ENTRAR NA ESCOLA <i class="fas fa-rocket"></i>
-      </button>
-      <p class="welcome-small"><i class="fas fa-floppy-disk"></i> Seu progresso fica salvo neste celular.</p>
+<section id="welcome-screen" class="welcome">
+  <div class="welcome-icon">🎓</div>
+  <h1>BEM VINDOOOO!!!</h1>
+  <p>Sua jornada do zero ao avançado em HTML e CSS começa agora.</p>
+  <button id="enter-btn" class="game-btn primary">ENTRAR NA ESCOLA 🚀</button>
+</section>
+
+<div id="app" class="app hidden">
+  <header class="topbar">
+    <div>
+      <div class="logo">Velho<span>Escola</span></div>
+      <small id="header-prestige">Prestígio 1</small>
     </div>
-  </div>
+    <div class="top-actions">
+      <span class="streak">🔥 <b id="header-streak">0</b></span>
+      <button id="reset-btn" class="icon-btn" title="Apagar progresso">🗑️</button>
+    </div>
+  </header>
 
-  <div id="app" class="app-container">
-    <header class="topbar glass-card">
-      <div>
-        <div class="logo">Velho<span>Escola</span></div>
-        <div id="header-prestige" class="prestige-label">PRESTÍGIO 1</div>
+  <main id="screen-map" class="screen active">
+    <div class="hero-card">
+      <div class="hero-icon">🗺️</div>
+      <h2>Trilha de Estudos</h2>
+      <p>150 níveis • 5 prestígios</p>
+    </div>
+    <div id="path-container" class="path"></div>
+  </main>
+
+  <main id="screen-lesson-intro" class="screen">
+    <button class="back-btn" data-action="home">← Voltar</button>
+    <div class="lesson-head">
+      <span id="lesson-badge" class="badge">NÍVEL 1</span>
+      <h2 id="lesson-title">Título</h2>
+    </div>
+    <section class="card">
+      <h3>📖 O que vamos aprender</h3>
+      <p id="lesson-learn"></p>
+      <div class="metaphor">
+        <h3>💡 Metáfora da Casa</h3>
+        <p id="lesson-metaphor"></p>
       </div>
-      <div class="top-actions">
-        <div class="streak-pill"><i class="fas fa-fire"></i><span id="header-streak">0</span></div>
-        <button id="btn-reset" class="icon-button" title="Apagar progresso"><i class="fas fa-trash-can"></i></button>
-      </div>
-    </header>
+    </section>
+    <button id="start-quiz-btn" class="game-btn primary">INICIAR DESAFIO 🎮</button>
+  </main>
 
-    <main id="screen-map" class="screen active page">
-      <section class="hero-card glass-card">
-        <i class="fas fa-map-location-dot hero-icon"></i>
-        <h2>Trilha de Estudos</h2>
-        <p id="map-subtitle">150 níveis • 5 prestígios</p>
-      </section>
-      <section id="path-container" class="level-path"></section>
-    </main>
+  <main id="screen-quiz" class="screen quiz-screen">
+    <div class="quiz-top">
+      <button id="abort-btn" class="icon-btn">✕</button>
+      <div class="progress-track"><div id="quiz-progress"></div></div>
+    </div>
+    <div class="quiz-content">
+      <h2 id="question-text">Pergunta?</h2>
+      <div id="options-container"></div>
+    </div>
+    <button id="check-btn" class="game-btn primary" disabled>VERIFICAR ✓</button>
+    <div id="feedback" class="feedback hidden">
+      <div id="feedback-icon" class="feedback-icon">🎉</div>
+      <h2 id="feedback-title">Feedback</h2>
+      <p id="feedback-tip"></p>
+      <button id="next-btn" class="game-btn">CONTINUAR →</button>
+    </div>
+  </main>
 
-    <main id="screen-prestiges" class="screen page">
-      <section class="hero-card glass-card">
-        <i class="fas fa-crown hero-icon gold"></i>
-        <h2>Galeria de Prestígios</h2>
-        <p>Conquiste 30 níveis para abrir a próxima sala da escola.</p>
-      </section>
-      <section id="prestiges-list" class="stack"></section>
-    </main>
+  <main id="screen-prestiges" class="screen">
+    <div class="hero-card"><div class="hero-icon">👑</div><h2>Galeria de Prestígios</h2><p>Cada 30 níveis revela um novo prestígio.</p></div>
+    <div id="prestiges-list"></div>
+  </main>
 
-    <main id="screen-dashboard" class="screen page">
-      <section class="hero-card glass-card">
-        <i class="fas fa-chart-line hero-icon green"></i>
-        <h2>Progresso Geral</h2>
-        <p>Sua caminhada rumo ao topo da engenharia web.</p>
-      </section>
+  <main id="screen-dashboard" class="screen">
+    <div class="hero-card"><div class="hero-icon">📈</div><h2>Progresso Geral</h2><p>Seu avanço rumo ao topo.</p></div>
+    <section class="card center">
+      <small>CONCLUSÃO TOTAL</small>
+      <div id="progress-percent" class="percent">0%</div>
+      <div class="progress-track"><div id="dashboard-bar"></div></div>
+    </section>
+    <section class="card">
+      <h3>Status dos níveis</h3>
+      <div id="levels-status-grid" class="status-grid"></div>
+    </section>
+  </main>
 
-      <section class="glass-card stat-card">
-        <div class="stat-caption">CONCLUSÃO TOTAL</div>
-        <div id="progress-percent" class="progress-number">0%</div>
-        <div class="progress-track"><div id="dashboard-bar" class="progress-fill"></div></div>
-        <div class="stat-row">
-          <span><i class="fas fa-check"></i> <b id="correct-total">0</b> acertos</span>
-          <span><i class="fas fa-fire"></i> melhor <b id="best-streak">0</b></span>
-        </div>
-      </section>
+  <nav class="bottom-nav">
+    <button data-screen="screen-map">🗺️<span>Trilha</span></button>
+    <button data-screen="screen-prestiges">👑<span>Prestígios</span></button>
+    <button data-screen="screen-dashboard">📊<span>Progresso</span></button>
+  </nav>
+</div>
 
-      <section class="glass-card status-card">
-        <h3>Status dos níveis</h3>
-        <div id="levels-status-grid" class="levels-grid"></div>
-      </section>
-    </main>
+<div id="prestige-overlay" class="overlay hidden">
+  <div class="prestige-key">🔑</div>
+  <h2>NOVO PRESTÍGIO! 👑</h2>
+  <p id="prestige-desc">Uma nova área foi desbloqueada.</p>
+  <button id="close-prestige" class="game-btn gold">CONTINUAR</button>
+</div>
 
-    <main id="screen-lesson" class="screen page">
-      <button id="btn-back-lesson" class="back-button"><i class="fas fa-arrow-left"></i></button>
-      <section class="lesson-heading">
-        <div id="lesson-badge" class="lesson-badge">NÍVEL 1</div>
-        <h2 id="lesson-title">Título</h2>
-      </section>
-      <section class="glass-card lesson-card">
-        <div class="lesson-block">
-          <h3><i class="fas fa-book-open"></i> O que vamos aprender</h3>
-          <p id="lesson-learn"></p>
-        </div>
-        <div class="metaphor">
-          <h3><i class="fas fa-lightbulb"></i> Metáfora da Casa</h3>
-          <p id="lesson-metaphor"></p>
-        </div>
-        <div id="lesson-example" class="code-example"></div>
-      </section>
-      <button id="btn-start-quiz" class="btn-game btn-purple">INICIAR DESAFIO <i class="fas fa-gamepad"></i></button>
-    </main>
-
-    <main id="screen-quiz" class="screen quiz-screen">
-      <div class="quiz-top glass-card">
-        <button id="btn-abort" class="icon-button"><i class="fas fa-xmark"></i></button>
-        <div class="quiz-progress-track"><div id="quiz-progress" class="quiz-progress"></div></div>
-        <div id="quiz-counter" class="quiz-counter">1/5</div>
-      </div>
-
-      <div class="quiz-content">
-        <div id="combo" class="combo hidden"></div>
-        <h2 id="question-text" class="question"></h2>
-        <div id="options-container" class="options"></div>
-      </div>
-
-      <div class="quiz-bottom glass-card">
-        <button id="btn-check" class="btn-game btn-purple" disabled>
-          VERIFICAR <i class="fas fa-check-circle"></i>
-        </button>
-      </div>
-
-      <div id="feedback-banner" class="feedback-banner">
-        <div class="feedback-icon" id="feedback-icon"></div>
-        <div class="feedback-copy">
-          <h3 id="feedback-title"></h3>
-          <p id="feedback-desc"></p>
-          <div class="feedback-tip"><i class="fas fa-comment-dots"></i><span id="feedback-tip"></span></div>
-        </div>
-        <button id="btn-next" class="btn-feedback">AVANÇAR <i class="fas fa-arrow-right"></i></button>
-      </div>
-    </main>
-
-    <nav class="bottom-nav">
-      <button class="nav-item active" data-screen="map"><i class="fas fa-road"></i><span>Trilha</span></button>
-      <button class="nav-item" data-screen="prestiges"><i class="fas fa-crown"></i><span>Prestígios</span></button>
-      <button class="nav-item" data-screen="dashboard"><i class="fas fa-chart-pie"></i><span>Progresso</span></button>
-    </nav>
-
-    <button id="music-toggle" class="music-toggle" title="Música"><i class="fas fa-music"></i></button>
-  </div>
-
-  <div id="prestige-overlay" class="overlay">
-    <div class="prestige-key"><i class="fas fa-key"></i></div>
-    <div class="eyebrow">NOVA CONQUISTA</div>
-    <h2 id="prestige-title">PRESTÍGIO 2 DESBLOQUEADO!</h2>
-    <p id="prestige-desc">Você abriu uma nova parte da escola.</p>
-    <button id="prestige-continue" class="btn-game btn-gold">CONTINUAR <i class="fas fa-door-open"></i></button>
-  </div>
-
-  <canvas id="confetti-canvas"></canvas>
-
-  
-    <script src="script.js" defer></script>
+<script src="./js/script.js" defer></script>
 </body>
 </html>
